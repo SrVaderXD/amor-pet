@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Veterinária Amor Pet</title>
+    <link rel="stylesheet" href="/static/estilo.css">
+</head>
+<body>
+    <header>
+        <h1>Clínica Veterinária Amor Pet</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/contato/">Fale conosco</a></li>
+                <li><a href="/cadastrar-consulta/">Área do veterinário</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+
+    <h1>Registro de Clientes e Animais</h1>
+    <form id="registroForm" action="/cadastrar-consulta/" method="post">
+        <label for="nome_pet">Nome do Pet:</label>
+        <input type="text" id="nome_pet" name="nome_pet" required><br><br>
+        
+        <label for="data_consulta">Data da Consulta:</label>
+        <input type="date" id="data_consulta" name="data_consulta" required><br><br>
+        
+        <label for="veterinario_responsavel">Veterinário Responsável:</label>
+        <input type="text" id="veterinario_responsavel" name="veterinario_responsavel" required><br><br>
+        
+        <input type="submit" value="Registrar">
+    </form>
+    
+    <footer>
+        <p>(19) 3656-0101 | Av. Nicolau Paione, 127 - Mococa -SP</p>
+        <p>Email: contato@amorpet.com.br | &copy; 2024 Clínica Veterinária Amor Pet</p>
+        <a href="/contato/">Entre em contato</a>
+    </footer>
+</body>
+</html>

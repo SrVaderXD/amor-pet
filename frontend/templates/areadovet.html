@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços - Clínica Veterinária Amor Pet</title>
+    <link rel="stylesheet" href="/static/estilo.css">
+</head>
+<body>
+    <header>
+        <h1>Clínica Veterinária Amor Pet</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/contato/">Fale conosco</a></li>
+                <li><a href="/cadastrar-consulta/">Área do veterinário</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="contato">
+            <h2>Insira a senha credenciada:</h2>
+            <form id="loginForm" onsubmit="return verificarSenha()">
+                <label for="senha">Senha:</label>
+                <input type="password" id="senha" name="senha">
+                <input type="submit" value="Entrar">
+            </form>
+            
+            <script>
+                function verificarSenha() {
+                    var senhaDigitada = document.getElementById("senha").value;
+                    
+                    if (senhaDigitada === "univesp") {
+                    window.location.href = "/cadastrar-consulta/";
+                    return false;
+                    } else {
+                        alert("Senha incorreta! Por favor, tente novamente.");
+                        return false;
+                    }
+                }
+            </script>
+        </section>
+    </main>
+
+    <footer>
+        <p>(19) 3656-0101 | Av. Nicolau Paione, 127 - Mococa -SP</p>
+        <p>Email: contato@amorpet.com.br | &copy; 2024 Clínica Veterinária Amor Pet</p>
+        <a href="/contato/">Entre em contato</a>
+    </footer>
+</body>
+</html>
