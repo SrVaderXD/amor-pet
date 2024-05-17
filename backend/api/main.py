@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from fastapi import FastAPI, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -35,7 +35,7 @@ def connection_to_database():
 class Consulta(BaseModel):
     nome_pet: str
     data_consulta: str
-    veterinario_responsavel: str
+    veterinario: str
 
 # Queries
 def query_get_all_data(cursor):
@@ -45,16 +45,27 @@ def query_get_all_data(cursor):
         return pets
     except sqlite3.Error as e:
         print(f"Erro ao obter os dados dos pets: {e}")
-        return []
+        return pets
 
 def query_insert_data(cursor, connection, consulta: Consulta):
     try:
-        cursor.execute("INSERT INTO consultas_pet (nome_pet, data_consulta, veterinario_responsavel) VALUES (?, ?, ?)",
-                       (consulta.nome_pet, consulta.data_consulta, consulta.veterinario_responsavel))
+        cursor.execute("INSERT INTO consultas_pet (nome_pet, data_consulta, veterinario) VALUES (?, ?, ?)",
+                       (consulta.nome_pet, consulta.data_consulta, consulta.veterinario))
         connection.commit()
     except sqlite3.Error as e:
         print(f"Erro ao inserir os dados da consulta: {e}")
         raise HTTPException(status_code=500, detail="Erro ao inserir os dados da consulta")
+    
+def search_query(connection, searched_word):
+    with connection.cursor() as cursor:
+        cursor.execute(f"""
+                    select 
+                    * 
+                    from consultas_pet
+                    where
+                    veterinario is like '%{searched_word}%'""")
+    consulta = cursor.fetchall()
+    return consulta
 
 # Rotas
 @app.get("/", response_class=HTMLResponse)
@@ -70,7 +81,16 @@ def get_pets(request: Request):
             raise HTTPException(status_code=500, detail="Erro ao conectar ao banco de dados")
         pets = query_get_all_data(cursor)
         connection_db.close()
-        return templates.TemplateResponse("areadovet.html", {"request": request, "data": pets})
+        return {"data": pets}
+
+@app.get("/area-do-vet/")
+async def area_do_vet(request: Request):
+    with open("../../frontend/templates/areadovet.html", encoding="utf-8") as f:
+        return templates.TemplateResponse("areadovet.html", {"request": request})
+    
+@app.get("/areadovet-logged/", response_class=HTMLResponse)
+async def intermediate(request: Request):
+    return templates.TemplateResponse("areadovetlogged.html", {"request": request})
 
 @app.get("/cadastrar-consulta/", response_class=HTMLResponse)
 async def cadastrar_consulta(request: Request):
@@ -78,9 +98,9 @@ async def cadastrar_consulta(request: Request):
         return templates.TemplateResponse("regconsultas.html", {"request": request})
 
 @app.post("/cadastrar-consulta/", response_class=HTMLResponse)
-async def cadastrar_consulta(request: Request, nome_pet: str = Form(...), data_consulta: str = Form(...), veterinario_responsavel: str = Form(...)):
+async def cadastrar_consulta(request: Request, nome_pet: str = Form(...), data_consulta: str = Form(...), veterinario: str = Form(...)):
     with open("../../frontend/templates/regconsultas.html", encoding="utf-8") as f:
-        consulta = Consulta(nome_pet=nome_pet, data_consulta=data_consulta, veterinario_responsavel=veterinario_responsavel)
+        consulta = Consulta(nome_pet=nome_pet, data_consulta=data_consulta, veterinario=veterinario)
         connection_db, cursor = connection_to_database()
         if connection_db is None:
             raise HTTPException(status_code=500, detail="Erro ao conectar ao banco de dados")
@@ -92,3 +112,7 @@ async def cadastrar_consulta(request: Request, nome_pet: str = Form(...), data_c
 async def contato(request: Request):
     with open("../../frontend/templates/contato.html", encoding="utf-8") as f:
         return templates.TemplateResponse("contato.html", {"request": request})
+    
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return FileResponse(os.path.join(STATIC_DIR, "favicon.ico"))
