@@ -56,16 +56,19 @@ def query_insert_data(cursor, connection, consulta: Consulta):
         print(f"Erro ao inserir os dados da consulta: {e}")
         raise HTTPException(status_code=500, detail="Erro ao inserir os dados da consulta")
     
-def search_query(connection, searched_word):
-    with connection.cursor() as cursor:
+def search_query(cursor, searched_word):
+    try:
         cursor.execute(f"""
-                    select 
+                    SELECT 
                     * 
-                    from consultas_pet
-                    where
-                    veterinario is like '%{searched_word}%'""")
-    consulta = cursor.fetchall()
-    return consulta
+                    FROM consultas_pet
+                    WHERE
+                    veterinario LIKE '%{searched_word}%'""")
+        consulta = cursor.fetchall()
+        return consulta
+    except sqlite3.Error as e:
+        print(f"Erro ao obter os dados dos pets: {e}")
+        return consulta
 
 # Rotas
 @app.get("/", response_class=HTMLResponse)
@@ -73,15 +76,17 @@ async def read_root(request: Request):
     with open("../../frontend/templates/index.html", encoding="utf-8") as f:
         return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/ver-consulta/")
-def get_pets(request: Request):
+@app.get("/pesquisar-consulta/", response_class=HTMLResponse)
+async def cadastrar_consulta(request: Request):
+    with open("../../frontend/templates/pesquisarconsul.html", encoding="utf-8") as f:
+        return templates.TemplateResponse("pesquisarconsul.html", {"request": request})
+
+@app.get("/ver-consulta")
+async def get_consultas(palavra: str = ''):
     connection_db, cursor = connection_to_database()
-    with open("../../frontend/templates/areadovet.html", encoding="utf-8") as f:
-        if connection_db is None:
-            raise HTTPException(status_code=500, detail="Erro ao conectar ao banco de dados")
-        pets = query_get_all_data(cursor)
-        connection_db.close()
-        return {"data": pets}
+    pets = search_query(cursor, palavra)
+    connection_db.close()
+    return {"data": pets}
 
 @app.get("/area-do-vet/")
 async def area_do_vet(request: Request):

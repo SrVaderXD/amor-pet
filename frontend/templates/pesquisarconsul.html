@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Veterinária Amor Pet</title>
+    <link rel="stylesheet" href="/static/estilo.css">
+</head>
+<body>
+    <header>
+        <h1>Clínica Veterinária Amor Pet</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1>Pesquisar consulta</h1>
+            <form id="searchForm">
+                <input type="text" id="searchInput" placeholder="Dr. Klebinho" required>
+                <button type="submit">Pesquisar</button>
+            </form>
+            <div id="result"></div>
+            <table id="resultTable" style="display:none;" class="tabela-">
+                <thead>
+                    <tr>
+                        <th>Nome do Pet</th>
+                        <th>Data Consulta</th>
+                        <th>Vet Responsável</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados das consultas serão inseridos aqui -->
+                </tbody>
+            </table>
+        </div>
+
+        <script>
+            document.getElementById('searchForm').addEventListener('submit', async function(event) {
+                event.preventDefault(); // Impede o envio do formulário
+                const searchedWord = document.getElementById('searchInput').value;
+                document.getElementById('result').textContent = 'Veterinário pesquisado: ' + searchedWord;
+
+                try {
+                    const response = await fetch("http://127.0.0.1:8000/ver-consulta?palavra=" + encodeURIComponent(searchedWord));
+                    const data = await response.json();
+                    
+                    const consultas = data.data; // Acessa os dados retornados pela API
+                    const resultTable = document.getElementById('resultTable');
+                    const tbody = resultTable.querySelector('tbody');
+                    tbody.innerHTML = ''; // Limpa a tabela antes de adicionar novos dados
+
+                    if (consultas.length > 0) {
+                        consultas.forEach(consulta => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${consulta[1]}</td>
+                                <td>${consulta[2]}</td>
+                                <td>${consulta[3]}</td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        resultTable.style.display = 'table'; // Mostra a tabela
+                    } else {
+                        document.getElementById('result').textContent = 'Nenhuma consulta encontrada para: ' + searchedWord;
+                        resultTable.style.display = 'none'; // Esconde a tabela
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar consultas:', error);
+                }
+            });
+        </script>
+    </main>
+    
+    <footer>
+        <p>(19) 3656-0101 | Av. Nicolau Paione, 127 - Mococa -SP</p>
+        <p>Email: contato@amorpet.com.br | &copy; 2024 Clínica Veterinária Amor Pet</p>
+        <a href="/contato/">Entre em contato</a>
+    </footer>
+</body>
+</html>
