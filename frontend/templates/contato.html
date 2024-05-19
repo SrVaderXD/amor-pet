@@ -21,7 +21,7 @@
     <main>
         <section class="contato">
             <h2>Deixe sua mensagem!</h2>
-            <form action="enviar.php" method="post">
+            <form id="contatoForm">
                 <label for="nome">Nome:</label>
                 <input type="text" id="nome" name="nome" required>
                 <label for="email">Email:</label>
@@ -30,6 +30,7 @@
                 <textarea id="mensagem" name="mensagem" required></textarea>
                 <button type="submit">Enviar</button>
             </form>
+            <p id="mensagemEnviada" style="display:none;">Sua mensagem foi enviada com sucesso!</p>
         </section>
     </main>
     
@@ -38,5 +39,12 @@
         <p>Email: contato@amorpet.com.br | &copy; 2024 Clínica Veterinária Amor Pet</p>
         <a href="/contato/">Entre em contato</a>
     </footer>
+
+    <script>
+        document.getElementById('contatoForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o envio do formulário
+            document.getElementById('mensagemEnviada').style.display = 'block';
+        });
+    </script>
 </body>
 </html>
