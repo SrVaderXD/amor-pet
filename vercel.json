@@ -17,7 +17,7 @@
       },
       {
         "src": "/(.*)",
-        "dest": "backend/main.py"
+        "dest": "/backend/api/main.py"
       }
     ]
   }
