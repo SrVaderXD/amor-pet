@@ -11,10 +11,5 @@
       "src": "/(.*)",
       "dest": "backend/api/main.py"
     }
-  ],
-  "frameworks": {
-    "none": {
-      "preset": "none"
-    }
-  }
+  ]
 }
